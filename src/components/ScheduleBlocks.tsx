@@ -92,7 +92,7 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave, i
   const fixedColClasses = "border border-gray-400 p-1 font-bold text-sm min-w-[100px] text-center bg-white";
 
   return (
-    <div className="mt-6 space-y-8 overflow-x-auto pb-4" dir="rtl">
+    <div className={`mt-6 space-y-8 ${isExporting ? '' : 'overflow-x-auto'} pb-4`} dir="rtl">
       
       {/* Block 1 (21 to End) - Draggable */}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -100,8 +100,8 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave, i
           <table className={tableClasses}>
             <thead>
               <tr>
-                <th className={`border border-gray-400 bg-gray-200 w-24 p-1`}></th>
-                <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[150px]`}></th>
+                <th className={`border border-gray-400 bg-gray-200 w-24 p-1 text-center font-bold text-sm`}>اليوم</th>
+                <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[150px] text-center font-bold text-sm`}>الاسماء</th>
                 {blocks.block1.map(d => (
                   <th key={d.dayNum} className={`border border-gray-400 bg-gray-200 p-1 text-center font-bold min-w-[70px]`}>
                     {d.dayNum}

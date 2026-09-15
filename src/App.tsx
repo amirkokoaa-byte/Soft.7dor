@@ -127,7 +127,7 @@ export default function App() {
     wsData.push([]); 
     
     // Block 1
-    wsData.push(["يوم الاجازة", "الاسم", ...dateBlocks.block1.map(d => d.dayNum.toString())]);
+    wsData.push(["اليوم", "الاسماء", ...dateBlocks.block1.map(d => d.dayNum.toString())]);
     wsData.push(["", "", ...dateBlocks.block1.map(d => d.dayName)]);
     tableEmployees.forEach(emp => {
       wsData.push([
@@ -210,48 +210,50 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans p-4 md:p-8" dir="rtl">
-      <div className="max-w-[1920px] mx-auto bg-white p-6 shadow-xl rounded-2xl border border-gray-100">
+    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans p-2 sm:p-4 md:p-8" dir="rtl">
+      <div className="max-w-[1920px] mx-auto bg-white p-4 sm:p-6 shadow-xl rounded-2xl border border-gray-100">
         
         {/* Controls Toolbar (Modern UI for managing the table) */}
-        <div className="flex flex-wrap items-center justify-between bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-8 gap-4">
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-8 gap-4">
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-              <CalendarDays className="w-5 h-5 text-blue-600" />
-              <label className="font-semibold text-gray-700 text-sm">تحديد الشهر:</label>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <div className="flex items-center justify-between sm:justify-start gap-3 bg-white p-2 rounded-lg border border-gray-200 shadow-sm w-full sm:w-auto">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="w-5 h-5 text-blue-600 shrink-0" />
+                <label className="font-semibold text-gray-700 text-sm whitespace-nowrap">تحديد الشهر:</label>
+              </div>
               <input 
                 type="month" 
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-transparent border-none text-sm focus:ring-0 outline-none cursor-pointer"
+                className="bg-transparent border-none text-sm focus:ring-0 outline-none cursor-pointer w-full sm:w-32"
               />
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button 
                 onClick={exportToExcel} 
-                className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm font-bold shadow-sm"
+                className="flex-1 sm:flex-none justify-center flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm font-bold shadow-sm whitespace-nowrap"
               >
-                <FileDown className="w-4 h-4" />
+                <FileDown className="w-4 h-4 shrink-0" />
                 تصدير Excel
               </button>
               <button 
                 onClick={exportToPDF} 
                 disabled={isExporting}
-                className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-bold shadow-sm disabled:opacity-50"
+                className="flex-1 sm:flex-none justify-center flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-bold shadow-sm disabled:opacity-50 whitespace-nowrap"
               >
-                <FileImage className="w-4 h-4" />
-                {isExporting ? 'جاري التصدير...' : 'تصدير PDF'}
+                <FileImage className="w-4 h-4 shrink-0" />
+                {isExporting ? 'التصدير...' : 'تصدير PDF'}
               </button>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-              <label className="text-sm font-medium text-gray-600">اختيار موظف:</label>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm w-full sm:w-auto">
+              <label className="text-sm font-medium text-gray-600 whitespace-nowrap shrink-0">اختيار موظف:</label>
               <select 
-                className="bg-transparent border-none text-sm min-w-[200px] focus:ring-0 outline-none cursor-pointer"
+                className="bg-transparent border-none text-sm w-full sm:w-48 focus:ring-0 outline-none cursor-pointer flex-1"
                 onChange={(e) => {
                   handleSelectEmployee(e.target.value);
                   e.target.value = ''; 
@@ -268,18 +270,18 @@ export default function App() {
               </select>
             </div>
 
-            <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm pr-3">
+            <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm pr-3 w-full sm:w-auto">
               <input 
                 type="text" 
                 placeholder="اسم موظف جديد..." 
                 value={newEmployeeInput}
                 onChange={(e) => setNewEmployeeInput(e.target.value)}
                 onKeyDown={(e) => { if(e.key === 'Enter') handleAddNewEmployee() }}
-                className="bg-transparent border-none text-sm w-48 focus:ring-0 outline-none"
+                className="bg-transparent border-none text-sm flex-1 sm:w-40 focus:ring-0 outline-none"
               />
               <button 
                 onClick={handleAddNewEmployee}
-                className="bg-blue-600 text-white p-1.5 rounded-md hover:bg-blue-700 transition-colors shadow-sm"
+                className="bg-blue-600 text-white p-1.5 rounded-md hover:bg-blue-700 transition-colors shadow-sm shrink-0"
                 title="إضافة للجدول"
               >
                 <Plus className="w-4 h-4" />
@@ -289,35 +291,37 @@ export default function App() {
         </div>
 
         {/* --- PRINTABLE AREA START --- */}
-        <div ref={printRef} className="bg-white overflow-hidden" style={{ padding: isExporting ? '20px' : '0' }}>
-          {/* Header Section (Matching Image Header) */}
-          <div className="flex justify-between items-center border-b-2 border-gray-800 pb-4 mb-6">
-            <div className="flex items-center gap-4">
-               <div className="border border-black p-2 min-w-[100px] text-center font-bold">
-                 {/* Empty boxes from image */}
-               </div>
-               <div className="border border-black p-2 min-w-[150px]">
-               </div>
+        <div ref={printRef} className={`bg-white ${isExporting ? 'overflow-visible w-max min-w-full' : 'overflow-x-auto overflow-y-hidden'}`} style={{ padding: isExporting ? '20px' : '0' }}>
+          <div className={isExporting ? '' : 'min-w-[1200px]'}>
+            {/* Header Section (Matching Image Header) */}
+            <div className="flex flex-row justify-between items-center border-b-2 border-gray-800 pb-4 mb-6 gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                 <div className="border border-black p-2 w-16 sm:min-w-[100px] h-10 text-center font-bold">
+                   {/* Empty boxes from image */}
+                 </div>
+                 <div className="border border-black p-2 w-24 sm:min-w-[150px] h-10">
+                 </div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <h1 className="text-sm sm:text-lg md:text-xl font-bold whitespace-nowrap">حضور واجازات : {formattedCurrentMonth}</h1>
+                <h2 className="text-sm sm:text-lg md:text-xl font-bold">{formattedNextMonth}</h2>
+              </div>
+              
+              <div className="text-sm sm:text-lg md:text-xl font-bold px-2 sm:px-8 whitespace-nowrap shrink-0">
+                اجازات رسميه :
+              </div>
             </div>
-            
-            <div className="flex flex-col items-center">
-              <h1 className="text-xl font-bold">حضور واجازات : {formattedCurrentMonth}</h1>
-              <h2 className="text-xl font-bold">{formattedNextMonth}</h2>
-            </div>
-            
-            <div className="text-xl font-bold px-8">
-              اجازات رسميه :
-            </div>
-          </div>
 
-          {/* The 3 Schedule Blocks */}
-          <ScheduleBlocks 
-            employees={tableEmployees}
-            setEmployees={setTableEmployees}
-            blocks={dateBlocks}
-            onEditLeave={handleEditLeave}
-            isExporting={isExporting}
-          />
+            {/* The 3 Schedule Blocks */}
+            <ScheduleBlocks 
+              employees={tableEmployees}
+              setEmployees={setTableEmployees}
+              blocks={dateBlocks}
+              onEditLeave={handleEditLeave}
+              isExporting={isExporting}
+            />
+          </div>
         </div>
         {/* --- PRINTABLE AREA END --- */}
 
