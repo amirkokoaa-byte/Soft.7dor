@@ -19,13 +19,13 @@ function SortableBlock1Row({ employee, days, onEditLeave, onDelete }: { employee
   return (
     <tr ref={setNodeRef} style={style} className={`bg-white ${isDragging ? 'opacity-50' : ''}`}>
       <td 
-        className="font-bold cursor-pointer hover:bg-gray-100 transition-colors"
+        className="font-bold cursor-pointer hover:bg-gray-100 transition-colors print:text-[9px] text-center"
         onClick={() => onEditLeave(employee)}
       >
         {ARABIC_DAYS[employee.leaveDay]}
       </td>
-      <td className="text-center font-semibold">{employee.code}</td>
-      <td className="font-bold">
+      <td className="text-center font-semibold print:text-[9px]">{employee.code}</td>
+      <td className="font-bold print:text-[9px]">
         <div className="flex items-center justify-between gap-1 px-1">
           <div className="flex items-center gap-1">
             <button {...attributes} {...listeners} className="cursor-grab text-gray-400 outline-none p-1 no-print">
@@ -92,8 +92,8 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
               <th className="w-48">الاسم</th>
               {blocks.block1.map((d: DateInfo) => (
                 <React.Fragment key={`hdr-${d.dayNum}`}>
-                  <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
-                  <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
+                <th className="w-24 min-w-[70px] print:min-w-[40px]">{d.dayName}</th>
+                <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
                 </React.Fragment>
               ))}
             </tr>
@@ -112,11 +112,12 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
       <table className="excel-table text-xs lg:text-sm print:text-[11px]">
         <thead>
           <tr>
-            <th className="w-24">رصيد الاجازات</th>
+            <th className="w-24">الاجازة الاسبوعية</th>
+            <th className="w-24">كود الموظف</th>
             <th className="w-48">الاسم</th>
             {blocks.block2.map((d: DateInfo) => (
               <React.Fragment key={`hdr-${d.dayNum}`}>
-                <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
+                <th className="w-24 min-w-[70px] print:min-w-[40px]">{d.dayName}</th>
                 <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
               </React.Fragment>
             ))}
@@ -125,8 +126,9 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
         <tbody>
           {employees.map((emp: Employee) => (
             <tr key={emp.id}>
-              <td></td>
-              <td className="font-bold text-right pr-2">{emp.name}</td>
+              <td className="font-bold text-center print:text-[9px]">{ARABIC_DAYS[emp.leaveDay]}</td>
+              <td className="text-center font-semibold print:text-[9px]">{emp.code}</td>
+              <td className="font-bold text-right pr-2 print:text-[9px]">{emp.name}</td>
               {blocks.block2.map((day: DateInfo) => {
                 const isLeave = day.dayOfWeek === emp.leaveDay;
                 return (
@@ -149,11 +151,12 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
       <table className="excel-table text-xs lg:text-sm print:text-[11px]">
         <thead>
           <tr>
-            <th className="w-24">استنفذ اليومين</th>
+            <th className="w-24">الاجازة الاسبوعية</th>
+            <th className="w-24">كود الموظف</th>
             <th className="w-48">الاسم</th>
             {blocks.block3.map((d: DateInfo) => (
               <React.Fragment key={`hdr-${d.dayNum}`}>
-                <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
+                <th className="w-24 min-w-[70px] print:min-w-[40px]">{d.dayName}</th>
                 <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
               </React.Fragment>
             ))}
@@ -162,8 +165,9 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
         <tbody>
           {employees.map((emp: Employee) => (
             <tr key={emp.id}>
-              <td></td>
-              <td className="font-bold text-right pr-2">{emp.name}</td>
+              <td className="font-bold text-center print:text-[9px]">{ARABIC_DAYS[emp.leaveDay]}</td>
+              <td className="text-center font-semibold print:text-[9px]">{emp.code}</td>
+              <td className="font-bold text-right pr-2 print:text-[9px]">{emp.name}</td>
               {blocks.block3.map((day: DateInfo) => {
                 const isLeave = day.dayOfWeek === emp.leaveDay;
                 return (

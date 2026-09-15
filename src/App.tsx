@@ -111,16 +111,16 @@ export default function App() {
     wsData.push([]);
     
     // Block 2
-    wsData.push(["رصيد الاجازات", "الاسم", ...dateBlocks.block2.flatMap(d => [d.dayName, d.dayNum.toString()])]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block2.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push(["", emp.name, ...dateBlocks.block2.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block2.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
     wsData.push([]);
     
     // Block 3
-    wsData.push(["استنفذ اليومين", "الاسم", ...dateBlocks.block3.flatMap(d => [d.dayName, d.dayNum.toString()])]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block3.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push(["", emp.name, ...dateBlocks.block3.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block3.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -167,7 +167,7 @@ export default function App() {
 
       {/* Main Print Container */}
       {selectedMonth && dateBlocks ? (
-        <div className="p-4 print:p-0 mx-auto max-w-full overflow-x-auto print:overflow-visible">
+        <div className="p-4 print:p-0 mx-auto max-w-full overflow-x-auto print:overflow-visible print-wrapper">
           <div className="min-w-[1000px] print:min-w-full bg-white print:shadow-none shadow-xl p-4 print:p-0 rounded-xl print:rounded-none">
             {/* Table Header matching image */}
             <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-2 print:border-b-[1px]">
