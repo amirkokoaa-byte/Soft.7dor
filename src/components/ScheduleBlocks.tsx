@@ -1,19 +1,11 @@
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Employee, DateBlocks, ARABIC_DAYS, DateInfo } from '../types';
-import { GripVertical } from 'lucide-react';
+import { Employee, DateBlocks, DateInfo } from '../types';
+import { ARABIC_DAYS } from '../utils';
+import { GripVertical, Trash2 } from 'lucide-react';
 
-interface ScheduleBlocksProps {
-  employees: Employee[];
-  setEmployees: (employees: Employee[]) => void;
-  blocks: DateBlocks;
-  onEditLeave: (employee: Employee) => void;
-  isExporting?: boolean;
-}
-
-// --- Block 1: Sortable Row ---
-function SortableBlock1Row({ employee, days, onEditLeave, isExporting }: { employee: Employee, days: DateInfo[], onEditLeave: (emp: Employee) => void, isExporting?: boolean }) {
+function SortableBlock1Row({ employee, days, onEditLeave, onDelete }: { employee: Employee, days: DateInfo[], onEditLeave: any, onDelete: any }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: employee.id });
   
   const style = {
@@ -21,28 +13,28 @@ function SortableBlock1Row({ employee, days, onEditLeave, isExporting }: { emplo
     transition,
     zIndex: isDragging ? 50 : 1,
     position: isDragging ? 'relative' as const : 'static' as const,
-    boxShadow: isDragging ? '0 5px 15px rgba(0,0,0,0.1)' : 'none',
   };
 
   return (
-    <tr ref={setNodeRef} style={style} className={`bg-white hover:bg-blue-50/30 transition-colors ${isDragging ? 'bg-blue-50 opacity-90' : ''}`}>
+    <tr ref={setNodeRef} style={style} className={`bg-white ${isDragging ? 'opacity-50' : ''}`}>
       <td 
-        className={`border border-gray-400 p-1 text-center font-bold text-sm transition-colors ${!isExporting ? 'cursor-pointer hover:bg-gray-100' : ''}`}
-        onClick={() => !isExporting && onEditLeave(employee)}
-        title={!isExporting ? "انقر لتعديل الإجازة" : undefined}
+        className="font-bold cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={() => onEditLeave(employee)}
       >
         {ARABIC_DAYS[employee.leaveDay]}
       </td>
-      <td 
-        className="border border-gray-400 p-1 font-bold text-sm min-w-[150px]"
-      >
-        <div className="flex items-center gap-1">
-          {!isExporting && (
-            <button {...attributes} {...listeners} className="cursor-grab text-gray-400 hover:text-gray-700 outline-none p-1 hide-on-print">
-              <GripVertical size={16} />
+      <td className="text-center font-semibold">{employee.code}</td>
+      <td className="font-bold">
+        <div className="flex items-center justify-between gap-1 px-1">
+          <div className="flex items-center gap-1">
+            <button {...attributes} {...listeners} className="cursor-grab text-gray-400 outline-none p-1 no-print">
+              <GripVertical size={14} />
             </button>
-          )}
-          <span className="truncate">{employee.name}</span>
+            <span>{employee.name}</span>
+          </div>
+          <button onClick={() => onDelete(employee.id)} className="text-red-500 hover:text-red-700 no-print opacity-0 group-hover:opacity-100 transition-opacity">
+            <Trash2 size={14} />
+          </button>
         </div>
       </td>
       {days.map(day => {
@@ -50,9 +42,9 @@ function SortableBlock1Row({ employee, days, onEditLeave, isExporting }: { emplo
         return (
           <td 
             key={day.dayNum} 
-            className={`border border-gray-400 p-1 text-center text-xs whitespace-nowrap min-w-[70px] ${isLeave ? 'bg-yellow-300 font-bold' : ''}`}
+            className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}
           >
-            {isLeave ? 'سبوعيه' : employee.name}
+            {isLeave ? 'سبوعيه' : ''}
           </td>
         );
       })}
@@ -60,8 +52,7 @@ function SortableBlock1Row({ employee, days, onEditLeave, isExporting }: { emplo
   );
 }
 
-// --- Main Component ---
-export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave, isExporting }: ScheduleBlocksProps) {
+export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }: any) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -70,148 +61,105 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave, i
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = employees.findIndex((emp) => emp.id === active.id);
-      const newIndex = employees.findIndex((emp) => emp.id === over.id);
+      const oldIndex = employees.findIndex((emp: Employee) => emp.id === active.id);
+      const newIndex = employees.findIndex((emp: Employee) => emp.id === over.id);
       setEmployees(arrayMove(employees, oldIndex, newIndex));
     }
   };
 
-  if (employees.length === 0) {
-    return (
-      <div className="bg-white p-12 text-center text-gray-500 rounded-xl shadow-sm border border-gray-200 mt-6 font-medium">
-        الجدول فارغ حالياً. قم بإضافة أو اختيار موظف للبدء.
-      </div>
-    );
+  const handleDelete = (id: string) => {
+    if(confirm('هل أنت متأكد من حذف الموظف؟')) {
+      setEmployees(employees.filter((e: Employee) => e.id !== id));
+    }
   }
 
-  const tableClasses = "w-full border-collapse bg-white shadow-sm";
-  const headerRow1Classes = "bg-gray-100 text-gray-800 font-bold border-gray-400 text-center";
-  const headerRow2Classes = "bg-gray-50 text-gray-600 font-semibold border-gray-400 text-center text-sm";
-  const cellClasses = "border border-gray-400 p-1 text-center text-xs whitespace-nowrap min-w-[70px]";
-  const staticNameColClasses = "border border-gray-400 p-1 font-bold text-sm min-w-[150px] text-right px-3 bg-white";
-  const fixedColClasses = "border border-gray-400 p-1 font-bold text-sm min-w-[100px] text-center bg-white";
+  if (!blocks) return null;
 
   return (
-    <div className={`mt-6 space-y-8 ${isExporting ? '' : 'overflow-x-auto'} pb-4`} dir="rtl">
-      
-      {/* Block 1 (21 to End) - Draggable */}
+    <div className="flex flex-col gap-6 print:gap-2 excel-container bg-white w-full print:p-2" dir="rtl">
+      {/* Block 1 */}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div className="min-w-max border border-gray-400 shadow-md">
-          <table className={tableClasses}>
-            <thead>
-              <tr>
-                <th className={`border border-gray-400 bg-gray-200 w-24 p-1 text-center font-bold text-sm`}>اليوم</th>
-                <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[150px] text-center font-bold text-sm`}>الاسماء</th>
-                {blocks.block1.map(d => (
-                  <th key={d.dayNum} className={`border border-gray-400 bg-gray-200 p-1 text-center font-bold min-w-[70px]`}>
-                    {d.dayNum}
-                  </th>
-                ))}
-              </tr>
-              <tr>
-                <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-                <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-                {blocks.block1.map(d => (
-                  <th key={d.dayNum} className={`border border-gray-400 bg-gray-100 p-1 text-center text-sm font-semibold`}>
-                    {d.dayName}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <SortableContext items={employees.map(e => e.id)} strategy={verticalListSortingStrategy}>
-              <tbody>
-                {employees.map(emp => (
-                  <SortableBlock1Row key={emp.id} employee={emp} days={blocks.block1} onEditLeave={onEditLeave} isExporting={isExporting} />
-                ))}
-              </tbody>
-            </SortableContext>
-          </table>
-        </div>
+        <table className="excel-table text-xs lg:text-sm print:text-[11px]">
+          <thead>
+            <tr>
+              <th rowSpan={2} className="w-24">الاجازة الاسبوعية</th>
+              <th rowSpan={2} className="w-24">كود الموظف</th>
+              <th rowSpan={2} className="w-48">الاسم</th>
+              {blocks.block1.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
+            </tr>
+            <tr>
+              {blocks.block1.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+            </tr>
+          </thead>
+          <SortableContext items={employees.map((e: Employee) => e.id)} strategy={verticalListSortingStrategy}>
+            <tbody className="group">
+              {employees.map((emp: Employee) => (
+                <SortableBlock1Row key={emp.id} employee={emp} days={blocks.block1} onEditLeave={onEditLeave} onDelete={handleDelete} />
+              ))}
+            </tbody>
+          </SortableContext>
+        </table>
       </DndContext>
 
-      {/* Block 2 (1 to 10) - Static */}
-      <div className="min-w-max border border-gray-400 shadow-md">
-        <table className={tableClasses}>
-          <thead>
-            <tr>
-              <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[150px]`}>الاسم</th>
-              <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[100px]`}>رصيد الاجازات</th>
-              {blocks.block2.map(d => (
-                <th key={d.dayNum} className={`border border-gray-400 bg-gray-200 p-1 text-center font-bold min-w-[70px]`}>
-                  {d.dayNum}
-                </th>
-              ))}
+      {/* Block 2 */}
+      <table className="excel-table text-xs lg:text-sm print:text-[11px]">
+        <thead>
+          <tr>
+            <th rowSpan={2} className="w-24">رصيد الاجازات</th>
+            <th rowSpan={2} className="w-48">الاسم</th>
+            {blocks.block2.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
+          </tr>
+          <tr>
+            {blocks.block2.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map((emp: Employee) => (
+            <tr key={emp.id}>
+              <td></td>
+              <td className="font-bold text-right pr-2">{emp.name}</td>
+              {blocks.block2.map((day: DateInfo) => {
+                const isLeave = day.dayOfWeek === emp.leaveDay;
+                return (
+                  <td key={day.dayNum} className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}>
+                    {isLeave ? 'سبوعيه' : ''}
+                  </td>
+                );
+              })}
             </tr>
-            <tr>
-              <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-              <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-              {blocks.block2.map(d => (
-                <th key={d.dayNum} className={`border border-gray-400 bg-gray-100 p-1 text-center text-sm font-semibold`}>
-                  {d.dayName}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map(emp => (
-              <tr key={emp.id} className="bg-white hover:bg-gray-50">
-                <td className={staticNameColClasses}>{emp.name}</td>
-                <td className={fixedColClasses}></td>
-                {blocks.block2.map(day => {
-                  const isLeave = day.dayOfWeek === emp.leaveDay;
-                  return (
-                    <td key={day.dayNum} className={`${cellClasses} ${isLeave ? 'bg-yellow-300 font-bold' : ''}`}>
-                      {isLeave ? 'سبوعيه' : emp.name}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
 
-      {/* Block 3 (11 to 20) - Static */}
-      <div className="min-w-max border border-gray-400 shadow-md">
-        <table className={tableClasses}>
-          <thead>
-            <tr>
-              <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[150px]`}>الاسم</th>
-              <th className={`border border-gray-400 bg-gray-200 p-1 min-w-[100px]`}>استنفذ اليومين</th>
-              {blocks.block3.map(d => (
-                <th key={d.dayNum} className={`border border-gray-400 bg-gray-200 p-1 text-center font-bold min-w-[70px]`}>
-                  {d.dayNum}
-                </th>
-              ))}
+      {/* Block 3 */}
+      <table className="excel-table text-xs lg:text-sm print:text-[11px]">
+        <thead>
+          <tr>
+            <th rowSpan={2} className="w-24">استنفذ اليومين</th>
+            <th rowSpan={2} className="w-48">الاسم</th>
+            {blocks.block3.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
+          </tr>
+          <tr>
+            {blocks.block3.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {employees.map((emp: Employee) => (
+            <tr key={emp.id}>
+              <td></td>
+              <td className="font-bold text-right pr-2">{emp.name}</td>
+              {blocks.block3.map((day: DateInfo) => {
+                const isLeave = day.dayOfWeek === emp.leaveDay;
+                return (
+                  <td key={day.dayNum} className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}>
+                    {isLeave ? 'سبوعيه' : ''}
+                  </td>
+                );
+              })}
             </tr>
-            <tr>
-              <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-              <th className={`border border-gray-400 bg-gray-100 p-1`}></th>
-              {blocks.block3.map(d => (
-                <th key={d.dayNum} className={`border border-gray-400 bg-gray-100 p-1 text-center text-sm font-semibold`}>
-                  {d.dayName}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map(emp => (
-              <tr key={emp.id} className="bg-white hover:bg-gray-50">
-                <td className={staticNameColClasses}>{emp.name}</td>
-                <td className={fixedColClasses}></td>
-                {blocks.block3.map(day => {
-                  const isLeave = day.dayOfWeek === emp.leaveDay;
-                  return (
-                    <td key={day.dayNum} className={`${cellClasses} ${isLeave ? 'bg-yellow-300 font-bold' : ''}`}>
-                      {isLeave ? 'سبوعيه' : emp.name}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
