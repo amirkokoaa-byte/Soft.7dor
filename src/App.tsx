@@ -12,14 +12,14 @@ export default function App() {
   const [showPreview, setShowPreview] = useState(false);
 
   const [employees, setEmployees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem('schedule_employees');
+    const saved = localStorage.getItem('schedule_employees_v2');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
-    return INITIAL_EMPLOYEES.map((name, i) => ({
+    return INITIAL_EMPLOYEES.map((emp, i) => ({
       id: `emp-${i}`,
-      name,
-      code: `E${(i + 1).toString().padStart(3, '0')}`,
+      name: emp.name,
+      code: emp.code,
       leaveDay: 5 // Default Friday
     }));
   });
@@ -35,7 +35,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('schedule_employees', JSON.stringify(employees));
+    localStorage.setItem('schedule_employees_v2', JSON.stringify(employees));
   }, [employees]);
 
   const dateBlocks = useMemo(() => {
@@ -104,26 +104,23 @@ export default function App() {
     wsData.push([]);
     
     // Block 1
-    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block1.map(d => d.dayName)]);
-    wsData.push(["", "", "", ...dateBlocks.block1.map(d => d.dayNum.toString())]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block1.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block1.map(d => d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : '')]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block1.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
     wsData.push([]);
     
     // Block 2
-    wsData.push(["رصيد الاجازات", "الاسم", ...dateBlocks.block2.map(d => d.dayName)]);
-    wsData.push(["", "", ...dateBlocks.block2.map(d => d.dayNum.toString())]);
+    wsData.push(["رصيد الاجازات", "الاسم", ...dateBlocks.block2.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push(["", emp.name, ...dateBlocks.block2.map(d => d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : '')]);
+      wsData.push(["", emp.name, ...dateBlocks.block2.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
     wsData.push([]);
     
     // Block 3
-    wsData.push(["استنفذ اليومين", "الاسم", ...dateBlocks.block3.map(d => d.dayName)]);
-    wsData.push(["", "", ...dateBlocks.block3.map(d => d.dayNum.toString())]);
+    wsData.push(["استنفذ اليومين", "الاسم", ...dateBlocks.block3.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push(["", emp.name, ...dateBlocks.block3.map(d => d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : '')]);
+      wsData.push(["", emp.name, ...dateBlocks.block3.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -157,8 +154,8 @@ export default function App() {
         <div className="flex flex-wrap items-center gap-4">
           <select onChange={(e) => { handleSelectDropdown(e.target.value); e.target.value = ''; }} className="border border-gray-300 p-1.5 rounded-lg text-sm w-48 outline-none focus:ring-2 focus:ring-blue-500" defaultValue="">
             <option value="" disabled>اختر موظف للجدول...</option>
-            {INITIAL_EMPLOYEES.filter(emp => !employees.some(e => e.name === emp)).map(emp => (
-              <option key={emp} value={emp}>{emp}</option>
+            {INITIAL_EMPLOYEES.filter(emp => !employees.some(e => e.name === emp.name)).map(emp => (
+              <option key={emp.code} value={emp.name}>{emp.name}</option>
             ))}
           </select>
           <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 p-1 rounded-lg">

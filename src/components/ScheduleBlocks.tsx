@@ -1,3 +1,4 @@
+import React from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -40,12 +41,16 @@ function SortableBlock1Row({ employee, days, onEditLeave, onDelete }: { employee
       {days.map(day => {
         const isLeave = day.dayOfWeek === employee.leaveDay;
         return (
-          <td 
-            key={day.dayNum} 
-            className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}
-          >
-            {isLeave ? 'سبوعيه' : ''}
-          </td>
+          <React.Fragment key={day.dayNum}>
+            <td className="font-bold text-center whitespace-nowrap px-1 text-[10px] lg:text-xs print:text-[10px]">
+              {employee.name}
+            </td>
+            <td 
+              className={`text-center ${isLeave ? 'bg-yellow-300 print-yellow font-bold text-[10px] lg:text-xs print:text-[10px]' : ''}`}
+            >
+              {isLeave ? 'سبوعيه' : ''}
+            </td>
+          </React.Fragment>
         );
       })}
     </tr>
@@ -82,13 +87,15 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
         <table className="excel-table text-xs lg:text-sm print:text-[11px]">
           <thead>
             <tr>
-              <th rowSpan={2} className="w-24">الاجازة الاسبوعية</th>
-              <th rowSpan={2} className="w-24">كود الموظف</th>
-              <th rowSpan={2} className="w-48">الاسم</th>
-              {blocks.block1.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
-            </tr>
-            <tr>
-              {blocks.block1.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+              <th className="w-24">الاجازة الاسبوعية</th>
+              <th className="w-24">كود الموظف</th>
+              <th className="w-48">الاسم</th>
+              {blocks.block1.map((d: DateInfo) => (
+                <React.Fragment key={`hdr-${d.dayNum}`}>
+                  <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
+                  <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
+                </React.Fragment>
+              ))}
             </tr>
           </thead>
           <SortableContext items={employees.map((e: Employee) => e.id)} strategy={verticalListSortingStrategy}>
@@ -105,12 +112,14 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
       <table className="excel-table text-xs lg:text-sm print:text-[11px]">
         <thead>
           <tr>
-            <th rowSpan={2} className="w-24">رصيد الاجازات</th>
-            <th rowSpan={2} className="w-48">الاسم</th>
-            {blocks.block2.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
-          </tr>
-          <tr>
-            {blocks.block2.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+            <th className="w-24">رصيد الاجازات</th>
+            <th className="w-48">الاسم</th>
+            {blocks.block2.map((d: DateInfo) => (
+              <React.Fragment key={`hdr-${d.dayNum}`}>
+                <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
+                <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
+              </React.Fragment>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -121,9 +130,14 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
               {blocks.block2.map((day: DateInfo) => {
                 const isLeave = day.dayOfWeek === emp.leaveDay;
                 return (
-                  <td key={day.dayNum} className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}>
-                    {isLeave ? 'سبوعيه' : ''}
-                  </td>
+                  <React.Fragment key={day.dayNum}>
+                    <td className="font-bold text-center whitespace-nowrap px-1 text-[10px] lg:text-xs print:text-[10px]">
+                      {emp.name}
+                    </td>
+                    <td className={`text-center ${isLeave ? 'bg-yellow-300 print-yellow font-bold text-[10px] lg:text-xs print:text-[10px]' : ''}`}>
+                      {isLeave ? 'سبوعيه' : ''}
+                    </td>
+                  </React.Fragment>
                 );
               })}
             </tr>
@@ -135,12 +149,14 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
       <table className="excel-table text-xs lg:text-sm print:text-[11px]">
         <thead>
           <tr>
-            <th rowSpan={2} className="w-24">استنفذ اليومين</th>
-            <th rowSpan={2} className="w-48">الاسم</th>
-            {blocks.block3.map((d: DateInfo) => <th key={`name-${d.dayNum}`} className="w-10">{d.dayName}</th>)}
-          </tr>
-          <tr>
-            {blocks.block3.map((d: DateInfo) => <th key={`num-${d.dayNum}`}>{d.dayNum}</th>)}
+            <th className="w-24">استنفذ اليومين</th>
+            <th className="w-48">الاسم</th>
+            {blocks.block3.map((d: DateInfo) => (
+              <React.Fragment key={`hdr-${d.dayNum}`}>
+                <th className="w-24 min-w-[70px] print:min-w-[50px]">{d.dayName}</th>
+                <th className="w-10 min-w-[30px] print:min-w-[20px]">{d.dayNum}</th>
+              </React.Fragment>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -151,9 +167,14 @@ export function ScheduleBlocks({ employees, setEmployees, blocks, onEditLeave }:
               {blocks.block3.map((day: DateInfo) => {
                 const isLeave = day.dayOfWeek === emp.leaveDay;
                 return (
-                  <td key={day.dayNum} className={`${isLeave ? 'bg-yellow-300 print-yellow font-bold text-xs' : ''}`}>
-                    {isLeave ? 'سبوعيه' : ''}
-                  </td>
+                  <React.Fragment key={day.dayNum}>
+                    <td className="font-bold text-center whitespace-nowrap px-1 text-[10px] lg:text-xs print:text-[10px]">
+                      {emp.name}
+                    </td>
+                    <td className={`text-center ${isLeave ? 'bg-yellow-300 print-yellow font-bold text-[10px] lg:text-xs print:text-[10px]' : ''}`}>
+                      {isLeave ? 'سبوعيه' : ''}
+                    </td>
+                  </React.Fragment>
                 );
               })}
             </tr>
