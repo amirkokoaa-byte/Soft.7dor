@@ -104,23 +104,23 @@ export default function App() {
     wsData.push([]);
     
     // Block 1
-    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block1.flatMap(d => [d.dayName, d.dayNum.toString()])]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", ...dateBlocks.block1.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block1.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, ...dateBlocks.block1.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
     wsData.push([]);
     
     // Block 2
-    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block2.flatMap(d => [d.dayName, d.dayNum.toString()])]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", ...dateBlocks.block2.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block2.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, ...dateBlocks.block2.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
     wsData.push([]);
     
     // Block 3
-    wsData.push(["الاجازة الاسبوعية", "كود الموظف", "الاسم", ...dateBlocks.block3.flatMap(d => [d.dayName, d.dayNum.toString()])]);
+    wsData.push(["الاجازة الاسبوعية", "كود الموظف", ...dateBlocks.block3.flatMap(d => [d.dayName, d.dayNum.toString()])]);
     employees.forEach(emp => {
-      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, emp.name, ...dateBlocks.block3.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
+      wsData.push([ARABIC_DAYS[emp.leaveDay], emp.code, ...dateBlocks.block3.flatMap(d => [emp.name, d.dayOfWeek === emp.leaveDay ? 'سبوعيه' : ''])]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -169,22 +169,34 @@ export default function App() {
       {selectedMonth && dateBlocks ? (
         <div className="p-4 print:p-0 mx-auto max-w-full overflow-x-auto print:overflow-visible print-wrapper">
           <div className="min-w-[1000px] print:min-w-full bg-white print:shadow-none shadow-xl p-4 print:p-0 rounded-xl print:rounded-none">
-            {/* Table Header matching image */}
-            <div className="flex justify-between items-end mb-4 border-b-2 border-black pb-2 print:border-b-[1px]">
-              <div className="flex items-center gap-2">
-                <div className="border border-black p-2 min-w-[60px] text-center font-bold h-6"></div>
-                <div className="border border-black p-2 min-w-[80px] h-6"></div>
-              </div>
-              <div className="text-center font-bold flex-1 flex flex-col items-center gap-1">
-                <div className="text-sm lg:text-base print:text-sm">
+            {/* Table Header matching user request */}
+            <div className="flex justify-between items-center mb-4 border-b-2 border-black pb-2 print:border-b-[1px]">
+              <div className="text-right font-bold flex flex-col gap-1 w-1/3">
+                <div className="text-sm lg:text-base print:text-sm whitespace-nowrap">
                   حضور واجازات : 21/{selectedMonth.split('-')[1]}/{selectedMonth.split('-')[0]}
                 </div>
-                <div className="text-sm lg:text-base print:text-sm">
-                  20/{Number(selectedMonth.split('-')[1]) === 12 ? 1 : Number(selectedMonth.split('-')[1]) + 1}/{Number(selectedMonth.split('-')[1]) === 12 ? Number(selectedMonth.split('-')[0]) + 1 : selectedMonth.split('-')[0]}
+                <div className="text-sm lg:text-base print:text-sm whitespace-nowrap">
+                  إلى : 20/{Number(selectedMonth.split('-')[1]) === 12 ? 1 : Number(selectedMonth.split('-')[1]) + 1}/{Number(selectedMonth.split('-')[1]) === 12 ? Number(selectedMonth.split('-')[0]) + 1 : selectedMonth.split('-')[0]}
                 </div>
               </div>
-              <div className="font-bold text-sm lg:text-base print:text-sm min-w-[120px] text-left pl-4">
-                اجازات رسميه :
+
+              <div className="text-center font-bold text-sm lg:text-base print:text-sm w-1/3 whitespace-nowrap">
+                اجازات رسمية :
+              </div>
+
+              <div className="text-left w-1/3 flex justify-end">
+                <table className="border-collapse border border-black text-sm print:text-xs">
+                  <tbody>
+                    <tr>
+                      <td className="border border-black p-1 px-3 font-bold bg-gray-100 print:bg-transparent whitespace-nowrap">بداية عمل</td>
+                      <td className="border border-black p-1 min-w-[80px]"></td>
+                    </tr>
+                    <tr>
+                      <td className="border border-black p-1 px-3 font-bold bg-gray-100 print:bg-transparent whitespace-nowrap">نهاية عمل</td>
+                      <td className="border border-black p-1 min-w-[80px]"></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
